@@ -32,6 +32,7 @@
 	<properties>
 		<java.version>21</java.version>
 		<postgresql.jdbc.version>42.7.8</postgresql.jdbc.version>
+		<liquibase.version>5.0.1</liquibase.version>
 		<lombok.version>1.18.42</lombok.version>
 	</properties>
 
@@ -51,6 +52,11 @@
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-data-jpa</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.liquibase</groupId>
+			<artifactId>liquibase-core</artifactId>
+			<version>${liquibase.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.postgresql</groupId>
