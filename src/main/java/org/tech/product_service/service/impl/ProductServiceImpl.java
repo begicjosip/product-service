@@ -5,9 +5,11 @@ import java.math.RoundingMode;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.tech.product_service.dto.request.ProductRequest;
 import org.tech.product_service.dto.response.ProductResponse;
+import org.tech.product_service.exception.ProductServiceException;
 import org.tech.product_service.mapper.ProductMapper;
 import org.tech.product_service.model.Product;
 import org.tech.product_service.repository.ProductRepository;
@@ -37,7 +39,8 @@ public class ProductServiceImpl implements ProductService {
     log.info("Creating product {}", request);
 
     if (productRepository.existsByCode(request.getCode())) {
-      throw new IllegalArgumentException("Product with code: " + request.getCode() + " already exists.");
+      throw new ProductServiceException("Product with code: " + request.getCode() + " already exists.",
+          HttpStatus.CONFLICT);
     }
     Product product = productMapper.toEntity(request);
     // TODO: Implement a real currency conversion service with external real-time data API
@@ -56,7 +59,8 @@ public class ProductServiceImpl implements ProductService {
   public ProductResponse getProductById(Long id) {
     log.info("Fetching product with ID: {}", id);
     Product product = productRepository.findById(id)
-        .orElseThrow(() -> new IllegalArgumentException("Product with ID: " + id + " not found."));
+        .orElseThrow(() -> new ProductServiceException("Product with ID: " + id + " not found.",
+            HttpStatus.NOT_FOUND));
     log.info("Product with ID: {} fetched from database.", id);
     return productMapper.toDto(product);
   }
