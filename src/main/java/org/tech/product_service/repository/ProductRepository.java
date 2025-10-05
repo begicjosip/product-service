@@ -25,4 +25,10 @@ import org.tech.product_service.model.Product;
 @Repository
 public interface ProductRepository extends JpaRepository<Product, Long> {
 
+  /**
+   * Checks if a product with the given code exists in the database.
+   * @param code the product code to check for existence
+   * @return true if a product with the specified code exists, false otherwise
+   */
+  boolean existsByCode(String code);
 }
