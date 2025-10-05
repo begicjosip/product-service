@@ -1,6 +1,7 @@
 package org.tech.product_service.external.hnb;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -30,7 +31,29 @@ public class HnbRateDto {
   @JsonProperty("valuta")
   private String currency;
 
+  /**
+   * Converts the middle exchange rate from a String to a BigDecimal.
+   * <p>
+   * HNB API returns the middle rate as a String with a comma as decimal separator
+   * (e.g., "1,173400"). This method replaces the comma with a dot and parses it
+   * into a BigDecimal suitable for calculations.
+   *
+   * @return the middle exchange rate as a {@link BigDecimal}
+   */
   public BigDecimal getMiddleRateAsBigDecimal() {
     return new BigDecimal(middleRate.replace(",", "."));
   }
+
+  /**
+   * Converts the date of application from a String to a LocalDate.
+   * <p>
+   * HNB API returns dates as ISO-8601 formatted strings (yyyy-MM-dd).
+   * This method parses the string into a {@link LocalDate} object.
+   *
+   * @return the date of application as a {@link LocalDate}
+   */
+  public LocalDate getDateOfApplicationAsLocalDate() {
+    return LocalDate.parse(dateOfApplication);
+  }
+
 }

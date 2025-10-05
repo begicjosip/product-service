@@ -2,6 +2,7 @@ package org.tech.product_service.service.impl;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.LocalDate;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -10,6 +11,8 @@ import org.springframework.stereotype.Service;
 import org.tech.product_service.dto.request.ProductRequest;
 import org.tech.product_service.dto.response.ProductResponse;
 import org.tech.product_service.exception.ProductServiceException;
+import org.tech.product_service.external.hnb.HnbClient;
+import org.tech.product_service.external.hnb.HnbRateDto;
 import org.tech.product_service.mapper.ProductMapper;
 import org.tech.product_service.model.Product;
 import org.tech.product_service.repository.ProductRepository;
@@ -31,8 +34,11 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class ProductServiceImpl implements ProductService {
 
+  private static final String USD_CURRENCY = "USD";
+
   private final ProductRepository productRepository;
   private final ProductMapper productMapper;
+  private final HnbClient hnbClient;
 
   @Override
   public ProductResponse createProduct(ProductRequest request) {
@@ -43,17 +49,33 @@ public class ProductServiceImpl implements ProductService {
           HttpStatus.CONFLICT);
     }
     Product product = productMapper.toEntity(request);
-    // TODO: Implement a real currency conversion service with external real-time data API
-    product.setPriceUsd(
-        request.getPriceEur()
-            .multiply(BigDecimal.valueOf(1.17))
-            .setScale(2, RoundingMode.HALF_UP)
-    );
+
+    HnbRateDto usdRate = hnbClient.getExchangeRateForCurrency(USD_CURRENCY);
+
+    if (usdRate == null || usdRate.getMiddleRateAsBigDecimal() == null
+        || usdRate.getDateOfApplicationAsLocalDate().isBefore(LocalDate.now())) {
+
+      log.info("USD rate is missing or stale. Refreshing from HNB...");
+      usdRate = hnbClient.refreshExchangeRateForCurrency(USD_CURRENCY);
+
+      if (usdRate == null || usdRate.getMiddleRateAsBigDecimal() == null) {
+        throw new ProductServiceException(
+            "Failed to fetch USD exchange rate from HNB.", HttpStatus.SERVICE_UNAVAILABLE);
+      }
+    }
+
+    BigDecimal usdPrice = request.getPriceEur()
+        .multiply(usdRate.getMiddleRateAsBigDecimal())
+        .setScale(2, RoundingMode.HALF_UP);
+
+    product.setPriceUsd(usdPrice);
 
     Product savedProduct = productRepository.save(product);
     log.info("Product with ID: {} saved to database.", savedProduct.getId());
+
     return productMapper.toDto(savedProduct);
   }
+
 
   @Override
   public ProductResponse getProductById(Long id) {
