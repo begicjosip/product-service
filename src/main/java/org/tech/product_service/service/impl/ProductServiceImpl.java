@@ -4,7 +4,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.tech.product_service.dto.request.ProductRequest;
@@ -66,9 +66,10 @@ public class ProductServiceImpl implements ProductService {
   }
 
   @Override
-  public Page<ProductResponse> getAllProducts(int page, int size) {
-    log.info("Fetching all products - page: {}, size: {}", page, size);
-    Page<Product> products = productRepository.findAll(PageRequest.of(page, size));
+  public Page<ProductResponse> getAllProducts(Pageable pageable) {
+    log.info("Fetching all products - page: {}, size: {}, sort: {}", pageable.getPageNumber(),
+        pageable.getPageSize(), pageable.getSort());
+    Page<Product> products = productRepository.findAll(pageable);
     log.info("Fetched {} products from database.", products.getNumberOfElements());
     return products.map(productMapper::toDto);
   }

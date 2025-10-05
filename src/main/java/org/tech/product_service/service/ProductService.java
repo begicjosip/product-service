@@ -2,6 +2,7 @@ package org.tech.product_service.service;
 
 
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.tech.product_service.dto.request.ProductRequest;
 import org.tech.product_service.dto.response.ProductResponse;
 
@@ -31,9 +32,8 @@ public interface ProductService {
 
   /**
    * Fetches all products with pagination support.
-   * @param page the page number to retrieve (0-indexed).
-   * @param size the number of products per page.
+   * @param pageable {@link Pageable} object containing pagination information.
    * @return a paginated list of {@link ProductResponse}.
    */
-  Page<ProductResponse> getAllProducts(int page, int size);
+  Page<ProductResponse> getAllProducts(Pageable pageable);
 }

@@ -2,6 +2,7 @@ package org.tech.product_service.controller;
 
 
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -44,7 +45,7 @@ public class ProductController implements ProductApi {
   }
 
   @Override
-  public ResponseEntity<Page<ProductResponse>> getAllProducts(int page, int size) {
-    return ResponseEntity.ok(productService.getAllProducts(page, size));
+  public ResponseEntity<Page<ProductResponse>> getAllProducts(Pageable pageable) {
+    return ResponseEntity.ok(productService.getAllProducts(pageable));
   }
 }

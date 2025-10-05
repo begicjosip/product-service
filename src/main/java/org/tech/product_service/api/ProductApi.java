@@ -1,6 +1,9 @@
 package org.tech.product_service.api;
 
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -9,7 +12,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.tech.product_service.dto.response.ProductResponse;
 import org.tech.product_service.dto.request.ProductRequest;
 
@@ -141,13 +143,12 @@ public interface ProductApi {
   /**
    * API endpoint for retrieving a paginated list of products
    * <p>
-   *   Supports pagination through 'page' and 'size' query parameters.
+   *   Supports pagination through pageable query parameters.
    *   Returns a paginated list of ProductResponse objects.
    *   Handles potential errors such as invalid pagination parameters,
    *   server errors.
    * </p>
-   * @param page - page number (zero-based)
-   * @param size - number of items per page(default is 25)
+   * @param pageable - {@link Pageable} object for pagination and sorting
    * @return ResponseEntity containing a {@link Page} of {@link ProductResponse} objects
    */
   @Operation(
@@ -220,8 +221,7 @@ public interface ProductApi {
   })
   @GetMapping
   ResponseEntity<Page<ProductResponse>> getAllProducts(
-      @Parameter(description = "Page number (zero-based)", example = "0")
-      @RequestParam(defaultValue = "0") int page,
-      @Parameter(description = "Page size", example = "25")
-      @RequestParam(defaultValue = "25") int size);
+      @ParameterObject
+      @PageableDefault(size = 50, sort = "id")
+      Pageable pageable);
 }
