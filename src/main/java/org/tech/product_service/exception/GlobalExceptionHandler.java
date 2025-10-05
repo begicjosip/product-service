@@ -9,10 +9,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
@@ -50,6 +52,21 @@ public class GlobalExceptionHandler {
         .body(problemDetails);
   }
 
+  @ExceptionHandler(NoResourceFoundException.class)
+  public ResponseEntity<ProblemDetail> handleNoResourceFoundException(
+      NoResourceFoundException ex, HttpServletRequest httpServletRequest) {
+    log.error("Resource not found: {}", ex.getMessage());
+    ProblemDetail problemDetails = ProblemDetail
+        .forStatusAndDetail(HttpStatus.NOT_FOUND, "The requested resource was not found.");
+    problemDetails.setTitle("Resource Not Found");
+    problemDetails.setInstance(URI.create(httpServletRequest.getRequestURI()));
+    problemDetails.setProperty(TIMESTAMP_PROPERTY, ZonedDateTime.now());
+    return ResponseEntity
+        .status(HttpStatus.NOT_FOUND)
+        .contentType(MediaType.APPLICATION_PROBLEM_JSON)
+        .body(problemDetails);
+  }
+
   @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
   public ResponseEntity<ProblemDetail> handleHttpMethodNotSupportedException(
       HttpRequestMethodNotSupportedException ex, HttpServletRequest httpServletRequest) {
@@ -61,6 +78,21 @@ public class GlobalExceptionHandler {
     problemDetails.setProperty(TIMESTAMP_PROPERTY, ZonedDateTime.now());
     return ResponseEntity
         .status(HttpStatus.METHOD_NOT_ALLOWED)
+        .contentType(MediaType.APPLICATION_PROBLEM_JSON)
+        .body(problemDetails);
+  }
+
+  @ExceptionHandler(HttpMessageNotReadableException.class)
+  public ResponseEntity<ProblemDetail> handleHttpMessageNotReadableException(
+      HttpMessageNotReadableException ex, HttpServletRequest httpServletRequest) {
+    log.error("Malformed JSON request: {}", ex.getMessage());
+    ProblemDetail problemDetails = ProblemDetail
+        .forStatusAndDetail(HttpStatus.BAD_REQUEST, "Malformed JSON request. Please check the syntax.");
+    problemDetails.setTitle("Bad Request");
+    problemDetails.setInstance(URI.create(httpServletRequest.getRequestURI()));
+    problemDetails.setProperty(TIMESTAMP_PROPERTY, ZonedDateTime.now());
+    return ResponseEntity
+        .status(HttpStatus.BAD_REQUEST)
         .contentType(MediaType.APPLICATION_PROBLEM_JSON)
         .body(problemDetails);
   }
@@ -88,6 +120,7 @@ public class GlobalExceptionHandler {
         "An unexpected error occurred. Please try again later.");
     problemDetails.setTitle("Internal Server Error");
     problemDetails.setInstance(URI.create(httpServletRequest.getRequestURI()));
+    problemDetails.setProperty(TIMESTAMP_PROPERTY, ZonedDateTime.now());
     return ResponseEntity
         .status(HttpStatus.INTERNAL_SERVER_ERROR)
         .contentType(MediaType.APPLICATION_PROBLEM_JSON)
