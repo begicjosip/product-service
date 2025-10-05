@@ -49,10 +49,10 @@ public class Product {
   @Column(nullable = false)
   private String name;
 
-  @Column(nullable = false)
+  @Column(precision = 19, scale = 2, nullable = false)
   private BigDecimal priceEur;
 
-  @Column(nullable = false)
+  @Column(precision = 19, scale = 2, nullable = false)
   private BigDecimal priceUsd;
 
   @Column(nullable = false)

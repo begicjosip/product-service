@@ -11,7 +11,7 @@
                labels="v1.0"
                dbms="postgresql">
         <createTable tableName="product">
-            <column name="id" type="BIGINT">
+            <column name="id" type="BIGINT" autoIncrement="true">
                 <constraints primaryKey="true"/>
             </column>
             <column name="code" type="VARCHAR(10)">
