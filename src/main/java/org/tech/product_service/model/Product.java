@@ -16,6 +16,21 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+/**
+ * Represents a product in the catalog.
+ * <p>
+ * The {@code Product} entity defines an item that can be sold within the system.
+ * Each product has a unique code, localized prices in EUR and USD, and an
+ * availability status. Audit fields track the creation and update timestamps.
+ *
+ * <p><strong>Usage:</strong>
+ * <ul>
+ *   <li>Managed by JPA and persisted in the {@code product} table.</li>
+ *   <li>Construct instances via Lombok's {@code @Builder} or the all-args constructor.</li>
+ * </ul>
+ *
+ * @author Josip Begic
+ */
 @Entity
 @Builder
 @Getter
