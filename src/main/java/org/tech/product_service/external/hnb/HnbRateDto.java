@@ -5,12 +5,15 @@ import java.time.LocalDate;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import lombok.Data;
+
 
 /**
  * DTO for HNB API rate.
  * @see <a href="https://api.hnb.hr/">HNB API documentation</a>
  * @author Josip Begic
  */
+@Data
 public class HnbRateDto {
   @JsonProperty("broj_tecajnice")
   private String noOfExchangeRate;
