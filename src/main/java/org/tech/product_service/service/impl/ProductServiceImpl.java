@@ -7,6 +7,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.tech.product_service.dto.request.ProductRequest;
 import org.tech.product_service.dto.response.ProductResponse;
 import org.tech.product_service.exception.ProductServiceException;
@@ -36,6 +37,7 @@ public class ProductServiceImpl implements ProductService {
   private final ProductMapper productMapper;
   private final ExchangeRateService exchangeRateService;
 
+  @Transactional
   @Override
   public ProductResponse createProduct(ProductRequest request) {
     log.info("Creating product {}", request);
@@ -57,6 +59,7 @@ public class ProductServiceImpl implements ProductService {
   }
 
 
+  @Transactional(readOnly = true)
   @Override
   public ProductResponse getProductById(Long id) {
     log.info("Fetching product with ID: {}", id);
@@ -67,6 +70,7 @@ public class ProductServiceImpl implements ProductService {
     return productMapper.toDto(product);
   }
 
+  @Transactional(readOnly = true)
   @Override
   public Page<ProductResponse> getAllProducts(Pageable pageable) {
     log.info("Fetching all products - page: {}, size: {}, sort: {}", pageable.getPageNumber(),
