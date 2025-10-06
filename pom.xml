@@ -127,6 +127,9 @@
 					<reportFormat>brief</reportFormat>
 					<trimStackTrace>true</trimStackTrace>
 					<failIfNoTests>true</failIfNoTests>
+					<systemPropertyVariables>
+						<spring.profiles.active>test</spring.profiles.active>
+					</systemPropertyVariables>
 				</configuration>
 			</plugin>
 			<plugin>
